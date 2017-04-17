@@ -1,0 +1,7 @@
+---
+
+breakfast:
+  - coffee:
+      - amount: 1
+      - unit: cup
+        
