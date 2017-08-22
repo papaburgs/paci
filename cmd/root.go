@@ -4,14 +4,27 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/papaburgs/paci/core"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
+
+var cfgFile string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "paci",
-	Short: "A food tracker",
-	Long:  `I should put more here later`,
+	Short: "command line calorie tracker",
+	Long: `A longer description that spans multiple lines and likely contains
+examples and usage of using your application. For example:
+
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
+	PreRun: preRun,
+	Run: func(cmd *cobra.Command, args []string) {
+		core.ReadAll(viper.GetString("dataPath"))
+	},
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -30,8 +43,30 @@ func init() {
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pacirc.yaml)")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.paci.yaml)")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+// initConfig reads in config file and ENV variables if set.
+func initConfig() {
+	if cfgFile != "" { // enable ability to specify config file via flag
+		viper.SetConfigFile(cfgFile)
+	}
+
+	viper.SetConfigName(".paci") // name of config file (without extension)
+	viper.AddConfigPath("$HOME") // adding home directory as first search path
+	viper.AutomaticEnv()         // read in environment variables that match
+
+	viper.SetDefault("dataPath", "/home/david/paci/data")
+	viper.SetDefault("logLevel", "debug")
+	// If a config file is found, read it in.
+	if err := viper.ReadInConfig(); err == nil {
+		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
+}
+
+func preRun(_ *cobra.Command, _ []string) {
+	core.InitLogger(viper.GetString("logLevel"))
 }
