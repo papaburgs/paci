@@ -1,26 +1,52 @@
 package core
 
+import "time"
+
+// LogEntry is what is expected as input
+type LogEntry struct {
+	TimeStampEntry time.Time
+	TimeStampLabel TimeLabel
+	Item           ItemType
+	Weight         AmountType
+	Water          AmountType
+}
+
+// Ingredient ties Item names to the nutritional info
 type Ingredient struct {
-	Name      string  `yaml:"name"`
-	Subname   string  `yaml:"subname"`
-	Calories  float32 `yaml:"calories"`
-	Serving   float32 `yaml:"serving"`
-	Carbs     float32 `yaml:"carbs"`
-	Fiber     float32 `yaml:"fiber"`
-	Protein   float32 `yaml:"protein"`
-	Fat       float32 `yaml:"fat"`
-	Sodium    float32 `yaml:"sodium"`
-	Magnesium float32 `yaml:"magnesium"`
-	Potassium float32 `yaml:"potassium"`
+	Name      string
+	Subname   string
+	Calories  float32
+	Serving   float32
+	Carbs     float32
+	Fiber     float32
+	Protein   float32
+	Fat       float32
+	Sodium    float32
+	Magnesium float32
+	Potassium float32
 }
 
-type Amount struct {
-	Value float32 `yaml:"value"`
-	Unit  string  `yaml:"unit"`
+// AmountType holds a value and a unit (ie, 500 grams)
+type AmountType struct {
+	Value float32
+	Unit  string
 }
 
-type Item struct {
-	Name     string `yaml:"name"`
-	Servings Amount `yaml:"servings"`
-	Contains []Item `yaml:"contains"`
+// ItemType defines a food, can contain other items
+type ItemType struct {
+	Name     string
+	Servings Amount
+	Contains []ItemType
 }
+
+// TimeLabel - not sure if I'll use it, but for use case where I want to group food by time of day
+type TimeLabel int
+
+const (
+	Breakfast = iota,
+		Lunch
+	SnackAM
+	SnackPM
+	Supper
+	SnackEve
+)
